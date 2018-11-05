@@ -62,6 +62,7 @@ contract RPS {
     // require same amount of ether as init awardStakes
     // cannot be called twice in a row
     require(initialStake != 0 && initialStake == msg.value && backingStake == 0);
+    require(player1 != player2);     // player can't play against self
 
     player2 = msg.sender;
     backingStake = msg.value;
@@ -135,6 +136,8 @@ contract RPS {
 
     }
 
+    reset();
+
   }
 
   // if the game is taking too long or if no one is accepting the initial stake
@@ -143,7 +146,6 @@ contract RPS {
 
     require(msg.sender == owner);
     require(now > initialisedTime + 24 * 3600 * 2);      // can only be called if current block is two days older than block when time was set
-    require(initialStake != 0);
 
     // transfer deposits back to players
 
