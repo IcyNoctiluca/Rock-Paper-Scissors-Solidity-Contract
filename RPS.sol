@@ -49,8 +49,18 @@ contract RPS {
 
 
   // returns true of the passed strings are identical
-  function compareStrings(string a, string b) public pure returns (bool) {
+  function compareStrings(string a, string b) private pure returns (bool) {
       return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
+  }
+
+  // check to see if player 1 exists
+  function player1Exists() public view returns (bool) {
+      return (!(initialStake == 0));    // p1 would have set a deposit in order to play
+  }
+
+  // check to see if player 2 exists
+  function player2Exists() public view returns (bool) {
+      return (!(backingStake == 0));    // p2 would have set a deposit in order to play
   }
 
   // allows a player to set a deposit
@@ -84,6 +94,11 @@ contract RPS {
     player1Hand = hand;
   }
 
+  // check if p1 has set their hand
+  function player1HandExists() view public returns (bool) {
+      return (compareStrings(player1Hand, "ROCK") || compareStrings(player1Hand, "PAPER") || compareStrings(player1Hand, "SCISSORS"));
+  }
+
   // player 2 sets which hand to play
   function setPlayer2Hand(string hand) public {
     // only player 2 can set his hand
@@ -93,11 +108,16 @@ contract RPS {
     player2Hand = hand;
   }
 
+  // check if p2 has set their hand
+  function player2HandExists() view public returns (bool) {
+      return (compareStrings(player2Hand, "ROCK") || compareStrings(player2Hand, "PAPER") || compareStrings(player2Hand, "SCISSORS"));
+  }
+
   // either player can choose to reveal which hands were set to determine the winner
   function revealHands() public {
     // either p1 or p2 can choose to reveal both hands
     require(msg.sender == player1 || msg.sender == player2);
-    require(!(compareStrings(player1Hand, "")) && !(compareStrings(player2Hand, "")));    // but both hands must have been set (cannot be empty strings)
+    require(player1HandExists() && player2HandExists());    // but both hands must have been set (cannot be empty strings)
     require(winner == -1);      // require winner to not already exist
 
     winner = outcomeMatrix[player1Hand][player2Hand];
@@ -191,6 +211,7 @@ contract RPS {
     player1 = address(0);
     player2 = address(0);
     winner = -1;
+    initialisedTime = 0;
   }
 
 }
