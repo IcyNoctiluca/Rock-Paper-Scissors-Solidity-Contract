@@ -67,6 +67,7 @@ contract RPS {
   function initialiseStake() payable public {
     // require initial stake to be 0, can't already have been set
     require(initialStake == 0 && msg.value > 0);
+    require(owner != msg.sender);   // owner cannot participate
 
     initialisedTime = now;        // block time of initialisation
     initialStake = msg.value;
@@ -80,6 +81,7 @@ contract RPS {
     // cannot be called twice in a row since backing stake is set
     require(initialStake != 0 && initialStake == msg.value && backingStake == 0);
     require(player1 != msg.sender);     // can't play against self
+    require(owner != msg.sender);   // owner cannot participate
 
     player2 = msg.sender;
     backingStake = msg.value;
